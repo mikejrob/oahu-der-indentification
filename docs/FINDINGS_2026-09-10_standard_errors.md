@@ -100,3 +100,71 @@ program mix that would support an event study.
 - Nothing here touches the PV coefficients, the wedge, the clock correction, or
   the low-sun-day result, which rest on the PV term and on within-year
   comparisons.
+
+---
+
+# ADDENDUM: the storage regressor is not a measurement
+
+Prompted by the observation that a 0.95 correlation between installed PV and
+installed storage cannot be right across a history in which early systems had
+almost no storage and recent ones nearly all do.
+
+## What `batt_mwh` actually contains
+
+In `der_points.parquet`, `batt_mwh` takes one value per program era, assigned
+flat to every system in that era. The 25th, 50th and 75th percentiles within an
+era are the same number:
+
+    era                systems   MWh per system
+    NEM/CGS             74,272        0.000467
+    CSS/SmartExport     21,538        0.001738
+    BatteryBonus        16,871        0.006516
+    SmartDER             8,565        0.007819
+
+It is not proportional to system size: regressing `batt_mwh` on era-specific
+rates times `kw_est` returns an R-squared of 0.034. It is a flat per-system
+allocation.
+
+Cumulative installed storage is therefore an era-weighted **count of PV
+systems**, not a capacity series. `batt_text`, the only field carrying textual
+evidence of a battery in the permit record, is true for 108 of 121,246 systems
+and accounts for 0.86 MWh of the 249.7 MWh island total. About 99.7 percent of
+the storage series is assigned rather than observed.
+
+## What this does to the battery result
+
+1. **The units are not megawatt-hours.** Per-MWh magnitudes are an artifact of
+   the four era constants and the 250 MWh island anchor, which the methods log
+   already records as unverified.
+2. **The energy-conservation check tests nothing.** The 0.45 against a 0.619
+   physical bound compares an estimate to a cap when the denominator is
+   assumed. Rescale the anchor and both move together. This was the paper's
+   strongest falsification test and it does not bear weight.
+3. **The high correlation with the PV stock is close to mechanical.** Both are
+   cumulative counts of the same systems under different weights.
+4. **The flat 0.077-0.082 MWh/MW ratio from 2009 to 2016** is the NEM/CGS
+   constant, not a decade of stable storage attachment. Extending the estimation
+   window to 2013 therefore buys less identification than the raw variance
+   decomposition suggests.
+
+There is real information in the series: era composition tracks when the storage
+programs operated, and Battery Bonus did drive genuine adoption. But the
+variable is a program-era index, not a stock.
+
+## What survives
+
+Everything resting on `pv_mw_cum`, which is built from `kw_est`, a genuine
+per-system capacity from permit records: the PV response, the behind-the-meter
+wedge, the clock correction, and the low-sun-day result.
+
+## What to do
+
+1. **Obtain a real storage series.** Hawaiian Electric publishes Battery Bonus
+   enrollments and CSS/SmartExport counts; EIA-861 carries small-scale storage.
+   Either gives measured capacity in place of an allocation.
+2. **Until then, state the battery effect in program terms.** A reduced-form
+   estimate per system, or per enrolled system, is defensible where a per-MWh
+   figure is not.
+3. **Battery Bonus as an event study.** The program opened mid-2021 and paid
+   specifically for evening discharge. It is the one source of variation that
+   moves storage on a timetable of its own rather than with rooftop PV.
