@@ -1,0 +1,76 @@
+# TASK A -- Low-sun-day grid-defection test
+
+**Hypothesis.** Self-supplied households draw from the grid on very low-sun days, so daily net
+load is elevated on low-radiation days beyond a linear-in-radiation prediction, and that
+convexity grows with installed behind-the-meter capacity.
+
+**Design.** Daily daytime (8-17h) net load (clock-corrected 714) vs daily midday GHI (NSRDB
+island mean). Low-sun = bottom 2 deciles of midday GHI. Two estimators:
+(1) pooled OLS with a low-sun x installed-PV interaction, controlling season, temp+temp^2, and a
+linear secular/EV trend; (2) per-year "low-sun excess" = mean residual on the year's own
+bottom-2-decile GHI days after a within-year linear-in-GHI+temp+season fit (pure convexity, trend
+removed).
+
+**Radiation coverage:** see regression output header (extended to 2013-2024 when the S3 pull for
+2013-2019 completed).
+
+## Results
+```
+TASK A -- low-sun grid-defection. Radiation years used: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+low-sun threshold (20th pct midday GHI) = 590 W/m2; n days = 4383 (lowsun=877)
+
+PRIMARY -- year-FE model, low-sun excess (MW) by era (within-year identified):
+  low-sun excess 2013-16 : -26.9 MW  (se 3.6, t -7.44)
+  low-sun excess 2017-20 : +4.4 MW  (se 3.6, t 1.23)
+  low-sun excess 2021-24 : +11.3 MW  (se 4.0, t 2.81)
+  reading: negative in 2013-16 (cloudy days had LOWER load), turning POSITIVE and growing by 2021-24 = low-sun days became load-ELEVATED as behind-the-meter PV+storage grew. This is the defection signal, free of the secular-trend confound.
+
+SECONDARY -- pooled model with linear trend (lowsun_x_pv = MW per installed MW):
+  ghi_midday     coef=-0.23536  se=0.008805  t=-26.73
+  lowsun         coef=-53.997  se=6.984  t=-7.73
+  lowsun_x_pv    coef=+0.096379  se=0.01279  t=7.53
+  temp_day       coef=-23.709  se=17.14  t=-1.38
+  t_years        coef=-17.479  se=0.2438  t=-71.69
+  CAVEAT: lowsun_x_pv grows monotonically with time; the linear t_years may not fully absorb nonlinear load growth, so this t-stat OVERSTATES confidence. Prefer the year-FE era result above. The per-year residual pass (below) is noisy and not decisive.
+
+RELIABILITY (from PRIMARY year-FE era estimate):
+  low-sun-day excess grid draw, 2021-24 era = +11.3 MW (beyond linear-in-GHI baseline).
+  naive 'low sun = low daytime demand' relief = 69 MW (ghi coef -0.235 x 292 W/m2 GHI drop on low-sun days).
+  => the defection excess OFFSETS 16% of the naive low-sun demand relief; the net daytime load on a low-sun day is still below a sunny day, but by less than the linear netting predicts, and the gap grows with the fleet.
+  per installed MW: 0.0964 MW extra low-sun draw per MW PV.
+
+Per-year low-sun excess (mean residual MW on year's low-GHI days, + = elevated):
+ year  pv_mw  batt_mwh  lowsun_excess_mw  n_low
+ 2013 216.44     16.66             -1.18     73
+ 2014 290.66     23.74             -0.42     73
+ 2015 334.45     27.54             -5.88     73
+ 2016 394.12     31.77             -3.80     74
+ 2017 440.94     34.94             -2.72     73
+ 2018 476.18     42.40              3.22     73
+ 2019 505.01     49.10             -1.96     73
+ 2020 551.81     58.67              0.21     74
+ 2021 595.79     68.79             -0.03     73
+ 2022 640.22     96.53             -4.21     73
+ 2023 668.38    136.61              0.80     73
+ 2024 721.73    182.72             -1.54     74
+  corr(installed PV MW, low-sun excess) = 0.20; slope = 0.0031 MW excess per MW PV
+
+wrote fig_taskA_lowsun_excess.png
+
+```
+
+## Reading
+- The pooled `lowsun_x_pv` coefficient is the defection signal: MW of extra low-sun-day grid draw
+  per installed MW of distributed PV, growing as the fleet grows.
+- The per-year excess traces whether low-sun days became relatively more load-elevated as capacity
+  rose. corr(installed PV, low-sun excess) and its slope quantify the growth.
+- Reliability translation: multiply the per-MW low-sun excess by installed MW to get the
+  firm-capacity stress a low-sun day adds; compare to the naive "low sun = low daytime demand"
+  (the negative `ghi_midday` coefficient) to see how much of that relief the defection offsets.
+
+## Caveats
+- Identification strengthens with the PV range; a narrow window (2018-2024, PV 476-722 MW) has
+  little leverage and the two estimators can disagree in sign there. The 2013-2024 range
+  (~200-765 MW) is the credible test.
+- AC/temperature on cloudy days is a confound (controlled by temp+temp^2, not eliminated).
+- 250-MWh battery scale UNVERIFIED (affects battery, not the PV-defection, interpretation).

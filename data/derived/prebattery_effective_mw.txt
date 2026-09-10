@@ -1,0 +1,7 @@
+Pre-battery effective usable AC MW per reported installed MW
+window 2013-2019 (NEM era; max batt/PV ratio 0.106 MWh/MW)
+4-hour daylight blocks, N=7668
+GHI x PV coefficient: -0.7913 (se 0.0327), month-clustered
+-> 0.791 MW grid-load reduction per reported MW at 1 kW/m2
+Interpretation: usable AC output per reported MW incl. tilt/aspect/
+soiling/inverter; consistent with a DC-nameplate reported series.

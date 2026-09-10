@@ -1,0 +1,23 @@
+(A) FIRMED EVENING-SHIFT PARAMETERIZATION (radiation-identified, 2018-2024)
+  clean sun-down window discharge shape (weights sum to 1):
+   19h=0.219, 20h=0.322, 21h=0.250, 22h=0.209
+  RADIATION-IDENTIFIED energy = 0.454 MWh delivered per installed MWh per day
+  physics cap rte*(1-reserve)*usable = 0.619 -> check PASSES (0.454 <= 0.619)
+  (collinear Estimator-1 gave 3.24 MWh/MWh, which FAILED the cap; radiation identification removes the PV-self-consumption + load-growth contamination.)
+  RECOMMENDED for Switch net-load model: energy = 0.45 MWh/MWh, distributed over the sun-down evening by the shape weights above (peak at 20h).
+  Residential/commercial: der_by_era program mix (NEM/CGS, CSS/SmartExport, BatteryBonus, SmartDER) is residential rooftop DER; the evening-shave is a residential-storage effect. No separable commercial-storage split in these data.
+  Battery-scale (250 MWh UNVERIFIED) sensitivity: per-MWh energy & shape are INVARIANT to the calibration (both numerator load-response and denominator MWh scale together); only ISLAND-TOTAL shifted energy scales linearly with it.
+
+(B) FIRMED g - beta INDUCED-DEMAND WEDGE (time-varying, battery-era radiation)
+ year  g_mwh_day_mw  beta_mwh_day_mw  wedge_mwh_day_mw  wedge_frac  pv_mw_installed  island_induced_gwh_yr
+ 2018         4.111            3.125             0.986       0.240          505.007                181.835
+ 2019         4.533            3.438             1.094       0.241          551.812                220.418
+ 2020         4.545            3.461             1.084       0.238          595.790                235.669
+ 2021         4.665            3.557             1.109       0.238          640.225                259.079
+ 2022         4.749            3.623             1.127       0.237          668.372                274.827
+ 2023         4.458            3.402             1.056       0.237          721.723                278.202
+ 2024         4.440            3.394             1.046       0.236          765.338                292.283
+  Interpretation: g-beta per MW = behind-the-meter induced demand + storage/inverter losses that never appear in grid load. Now identifiable per YEAR (radiation 2018-2024).
+  per-MW wedge 2018->2024: 0.986 -> 1.046 MWh/day/MW (24.0% -> 23.6% of generation)
+  island induced demand 2018->2024: 182 -> 292 GWh/yr
+  CAVEAT: g-beta mixes induced demand with inverter/storage losses; it is an UPPER bound on net new behind-the-meter consumption. PR=0.80 assumption moves g +/-6%.

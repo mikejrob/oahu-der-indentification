@@ -1,0 +1,6 @@
+# Pinned loosely; the estimators use nothing exotic.
+numpy>=1.24
+pandas>=2.0
+pyarrow>=12.0        # parquet
+statsmodels>=0.14    # OLS, HAC, Driscoll-Kraay (cov_type="hac-groupsum")
+matplotlib>=3.7      # figures

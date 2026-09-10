@@ -1,0 +1,14 @@
+TASK B zonal install cross-check
+der_points total: PV=793.3 MW, batt=249.7 MWh
+der_by_era total: PV=793.3 MW, batt=249.6 MWh
+  (small diff expected: der_points includes post-era-tally installs through 2025-06)
+
+final (2024) cumulative by zone:
+ year               zone  pv_mw_cum  batt_mwh_cum
+ 2024    Ewa_PearlHarbor      257.8          76.7
+ 2024     Honolulu_South      244.1          66.4
+ 2024    Windward_Koolau       90.5          34.3
+ 2024 Kunia_CentralBench       74.6          24.7
+ 2024       Waianae_Kahe       44.4          12.0
+ 2024 NorthShore_Waialua       30.0           5.4
+ 2024    Central_Wahiawa       24.0           8.1

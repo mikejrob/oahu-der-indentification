@@ -1,0 +1,8 @@
+FERC 714 clock-shift validation (after roll +1/0/-1)
+night-min hour by block (should be aligned ~3h now):
+  2006-2012: night-min hour = 3
+  2013-2020: night-min hour = 3
+  2021-2024: night-min hour = 3
+2021-24 corrected net-load midday trough hour = 12; NSRDB solar-noon hour = 12
+  (trough at/just after solar noon confirms the -1h roll; residual trough drift with installed MWh is the preserved battery signal, not a clock error.)
+  (for the record: UN-corrected 2021-24 trough hour = 13 -> +1h late; roll fixes it.)

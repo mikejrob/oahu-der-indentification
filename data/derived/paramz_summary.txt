@@ -1,0 +1,39 @@
+(A) EVENING-SHIFT PARAMETERIZATION
+ hour  beta_batt  se_batt  discharge_mw_per_mwh  shape_weight
+   16    -0.4099   0.0985                0.4099        0.1266
+   17    -0.5974   0.0912                0.5974        0.1845
+   18    -0.5887   0.0885                0.5887        0.1818
+   19    -0.5147   0.0854                0.5147        0.1589
+   20    -0.6059   0.0916                0.6059        0.1871
+   21    -0.5216   0.1014                0.5216        0.1611
+  discharge SHAPE weights (16-21h): 16h=0.127, 17h=0.184, 18h=0.182, 19h=0.159, 20h=0.187, 21h=0.161
+  raw regression-implied evening energy  = 3.238 MWh delivered / MWh installed
+  physics cap  rte*(1-reserve)*usable    = 0.619 MWh / MWh installed (rte=0.86 reserve=0.20 usable=0.90)
+  RECOMMENDED for Switch: energy = 0.62 MWh/MWh, distributed over evening by the shape weights above.
+  battery-scale sensitivity: all per-MWh numbers are invariant to the 250-MWh island calibration; only the ISLAND-TOTAL shifted energy (= per-MWh * installed MWh) scales with it (linearly).
+
+(B) g - beta INDUCED-DEMAND WEDGE (per installed MW, daily energy)
+  g (physical rooftop gen, PR=0.80) = 4.346 MWh/day/MW
+  beta (grid load reduction, radiation-identified) = 3.229 MWh/day/MW
+  g - beta = 1.116 MWh/day/MW = behind-the-meter induced demand + storage/inverter losses per MW that never appears in grid load.
+  as a fraction of generation: (g-beta)/g = 25.7%
+  uncertainty: beta = 3.229 +/- 0.066 (regression); g band (PR 0.75-0.85) = [4.074, 4.617]; wedge band ~ [0.779, 1.454] MWh/day/MW
+
+  ISLAND induced-demand time series (per-MW wedge x installed MW x 365d):
+ year  pv_mw_installed  wedge_mwh_per_mw_per_day  island_induced_gwh_per_year
+ 2010             52.4                       1.1                         21.3
+ 2011            104.9                       1.1                         42.7
+ 2012            216.4                       1.1                         88.2
+ 2013            290.7                       1.1                        118.4
+ 2014            334.4                       1.1                        136.3
+ 2015            394.1                       1.1                        160.6
+ 2016            440.9                       1.1                        179.7
+ 2017            476.2                       1.1                        194.0
+ 2018            505.0                       1.1                        205.8
+ 2019            551.8                       1.1                        224.9
+ 2020            595.8                       1.1                        242.8
+ 2021            640.2                       1.1                        260.9
+ 2022            668.4                       1.1                        272.4
+ 2023            721.7                       1.1                        294.1
+ 2024            765.3                       1.1                        311.9
+  NOTE: wedge per-MW is estimated on 2007/08/18/19 radiation+PV-term and held constant across years (no battery-era radiation to re-estimate it). The rising island total is driven by rising installed MW, not a re-estimated per-MW wedge.

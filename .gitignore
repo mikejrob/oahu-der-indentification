@@ -1,0 +1,10 @@
+# Raw panels: large, and rebuildable from public sources (FERC 714 via PUDL,
+# NSRDB via NREL's public S3). Pulled by scripts/pull_from_koa.sh, pinned by
+# sha256 in MANIFEST.sha256. Not tracked — see README, "Data".
+data/raw/
+*.parquet
+# environment
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
