@@ -1,7 +1,20 @@
 Pre-battery effective usable AC MW per reported installed MW
 window 2013-2019 (NEM era; max batt/PV ratio 0.106 MWh/MW)
 4-hour daylight blocks, N=7668
-GHI x PV coefficient: -0.7913 (se 0.0327), month-clustered
+GHI x PV coefficient: -0.7913 (se 0.0244, t -32.46)
+Newey-West (Driscoll-Kraay), 8 lags over 2556 days
+day-mean residual AR(1) rho 0.368; Andrews Bartlett bandwidth 14.0 days
+ACF: L1=0.368, L7=0.772, L14=0.743, L21=0.747, L28=0.734, L56=0.682, L90=0.203  (band +/-0.039)
+Ljung-Box: Q(7)=2480, Q(14)=4775, Q(28)=9354, Q(90)=27856
+bandwidth sensitivity (lag 0 = plain OLS):
+  lags  0: se 0.0240  t -32.98
+  lags  7: se 0.0233  t -34.01
+  lags 14: se 0.0266  t -29.78
+  lags 28: se 0.0307  t -25.77
+  lags 56: se 0.0345  t -22.91
+  lags 90: se 0.0356  t -22.22
++ day-of-week FE: coef -0.7716 (se 0.0204, t -37.90), rho 0.486, Andrews 18.4 d
+  ACF: L1=0.486, L7=0.302, L14=0.215, L21=0.233, L28=0.197, L56=0.057, L90=-0.014
 -> 0.791 MW grid-load reduction per reported MW at 1 kW/m2
 Interpretation: usable AC output per reported MW incl. tilt/aspect/
 soiling/inverter; consistent with a DC-nameplate reported series.
