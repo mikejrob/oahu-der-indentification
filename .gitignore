@@ -2,9 +2,13 @@
 # NSRDB via NREL's public S3). Pulled by scripts/pull_from_koa.sh, pinned by
 # sha256 in MANIFEST.sha256. Not tracked — see README, "Data".
 data/raw/
+!data/analysis/
 *.parquet
+!data/analysis/*.parquet
 # environment
 .venv/
 __pycache__/
 *.pyc
 .DS_Store
+# analysis-ready panels are tracked; the 45 MB plain CSV is not
+data/analysis/oahu_hourly_panel.csv
