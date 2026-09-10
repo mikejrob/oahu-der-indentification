@@ -29,7 +29,7 @@ OUT = os.environ.get(
                  "data", "derived"))
 os.makedirs(OUT, exist_ok=True)
 
-pan = pd.read_parquet(os.path.join(OUT, "panel_hourly_with_installs.parquet"))
+pan = pd.read_parquet(os.path.join(ANA, "panel_hourly_with_installs.parquet"))
 pan["dt_hst"] = pd.to_datetime(pan["dt_hst"])
 
 def roll(y):
@@ -45,7 +45,7 @@ pan["date"] = pan["dt_corr"].dt.date
 pan["year"] = pan["dt_corr"].dt.year
 pan["month"] = pan["dt_corr"].dt.month
 pan["quarter"] = pan["dt_corr"].dt.quarter
-pan.to_parquet(os.path.join(OUT, "panel_hourly_shifted.parquet"), index=False)
+pan.to_parquet(os.path.join(ANA, "panel_hourly_shifted.parquet"), index=False)
 
 # ---- validation: night-min hour should now be equal across blocks; and the 2021-24
 # midday PV trough (in NET load) should sit at solar noon (~12h) after the -1h roll.
@@ -60,7 +60,7 @@ for b in ["2006-2012", "2013-2020", "2021-2024"]:
     out.append(f"  {b}: night-min hour = {int(s[s.index<=8].idxmin())}")
 
 # midday trough of the 2021-24 net load (high PV) vs solar noon
-n = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
+n = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
 solarnoon = n[n.year.between(2021, 2024)].groupby("hour")["ghi"].mean().idxmax()
 s2124 = pan[pan.blk == "2021-2024"].groupby("hour")["load_mw"].mean()
 trough = s2124[s2124.index.isin(range(8, 16))].idxmin()
@@ -70,7 +70,7 @@ out.append("  (trough at/just after solar noon confirms the -1h roll; residual t
            "with installed MWh is the preserved battery signal, not a clock error.)")
 
 # compare to UN-corrected trough for the record
-raw = pd.read_parquet(os.path.join(OUT, "panel_hourly_with_installs.parquet"))
+raw = pd.read_parquet(os.path.join(ANA, "panel_hourly_with_installs.parquet"))
 raw = raw[raw.year.between(2021, 2024)]
 rawtrough = raw.groupby("hour")["load_mw"].mean()
 rawtrough = rawtrough[rawtrough.index.isin(range(8, 16))].idxmin()

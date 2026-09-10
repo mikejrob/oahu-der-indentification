@@ -65,7 +65,7 @@ dtemp = isl.groupby("date")["temp"].mean().rename("temp_day")
 dayrad = pd.concat([midday, dtemp], axis=1).reset_index()
 
 # ---- daily daytime net load from clock-corrected panel
-pan = pd.read_parquet(os.path.join(OUT, "panel_hourly_shifted.parquet"))
+pan = pd.read_parquet(os.path.join(ANA, "panel_hourly_shifted.parquet"))
 pan["date"] = pd.to_datetime(pan["date"])
 pan = pan[pan.year.isin(RAD_YEARS)]
 dayload = pan[pan.hour.between(8,17)].groupby("date").agg(

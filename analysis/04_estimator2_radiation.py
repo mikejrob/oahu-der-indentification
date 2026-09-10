@@ -40,12 +40,12 @@ YEARS = [2007, 2008, 2018, 2019]
 REF_GHI = 1000.0  # reference irradiance (W/m2) for reporting MW/MW at "full sun"
 
 # ---- load hourly panel with installs, restrict to radiation years
-pan = pd.read_parquet(os.path.join(OUT, "panel_hourly_with_installs.parquet"))
+pan = pd.read_parquet(os.path.join(ANA, "panel_hourly_with_installs.parquet"))
 pan = pan[pan["year"].isin(YEARS)].copy()
 pan["date"] = pd.to_datetime(pan["date"])
 
 # ---- radiation island-hourly
-isl = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly.parquet"))
+isl = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly.parquet"))
 isl["date"] = pd.to_datetime(isl[["year", "month", "day"]])
 isl = isl.rename(columns={"hour": "hour"})
 

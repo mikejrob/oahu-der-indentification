@@ -4,3 +4,5 @@ pandas>=2.0
 pyarrow>=12.0        # parquet
 statsmodels>=0.14    # OLS, HAC, Driscoll-Kraay (cov_type="hac-groupsum")
 matplotlib>=3.7      # figures
+s3fs>=2024.2          # NSRDB: anonymous byte-range reads from NREL's public bucket
+h5py>=3.11            # NSRDB national HDF5 files

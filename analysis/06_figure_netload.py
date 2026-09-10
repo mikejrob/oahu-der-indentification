@@ -19,7 +19,7 @@ OUT = os.environ.get(
                  "data", "derived"))
 os.makedirs(OUT, exist_ok=True)
 # clock-corrected panel (FERC 714 hour-shift roll +1/0/-1 applied)
-pan = pd.read_parquet(os.path.join(OUT, "panel_hourly_shifted.parquet"))
+pan = pd.read_parquet(os.path.join(ANA, "panel_hourly_shifted.parquet"))
 
 # eras by penetration
 def era(y):

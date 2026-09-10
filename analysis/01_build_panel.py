@@ -34,14 +34,16 @@ import pandas as pd
 # 2026-07-24 pull in sources/ferc714/ to <0.05 MW — the nightly build is
 # stable for respondent 178. Full table, not a pre-sliced file: the
 # respondent filter below does the slicing.
-ANA = os.environ.get("OAHU_ANA", os.path.dirname(os.path.abspath(__file__)))
+_HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ANA = os.environ.get("OAHU_ANA", os.path.join(_HERE, "data", "raw"))
+OUT = os.environ.get("OAHU_OUT", os.path.join(_HERE, "data", "derived"))
+os.makedirs(OUT, exist_ok=True)
 PUDL = os.environ.get(
     "OAHU_PUDL_714",
-    os.path.join(OUT, "out_ferc714__hourly_planning_area_demand.parquet"))
+    os.path.join(ANA, "out_ferc714__hourly_planning_area_demand.parquet"))
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DER = os.environ.get(
-    "OAHU_DER_POINTS",
-    os.path.join(_REPO, "sources", "der", "der_points.parquet"))
+    "OAHU_DER_POINTS", os.path.join(ANA, "der_points.parquet"))
 os.makedirs(ANA, exist_ok=True)
 
 # ---------------------------------------------------------------- load 714
@@ -67,7 +69,7 @@ d["era_714"] = np.where(d["year"] >= 2021, "XBRL", "CSV")
 d = d[d["load_mw"] > 0]
 d[["dt_hst", "date", "year", "month", "hour", "quarter", "load_mw", "era_714",
    "demand_imputed_pudl_mwh_imputation_code"]].to_parquet(
-    os.path.join(OUT, "load_hourly_oahu.parquet"), index=False)
+    os.path.join(ANA, "load_hourly_oahu.parquet"), index=False)
 print("load_hourly_oahu.parquet:", len(d), "rows,",
       d["year"].min(), "-", d["year"].max())
 
@@ -98,7 +100,7 @@ dd = pd.merge_asof(dd.sort_values("date_dt"), inst.sort_values("date"),
 dd["pv_mw_cum"] = dd["pv_mw_cum"].fillna(0.0)
 dd["batt_mwh_cum"] = dd["batt_mwh_cum"].fillna(0.0)
 dd = dd.drop(columns=["date_y"]).rename(columns={"date_x": "date"})
-dd.to_parquet(os.path.join(OUT, "panel_hourly_with_installs.parquet"), index=False)
+dd.to_parquet(os.path.join(ANA, "panel_hourly_with_installs.parquet"), index=False)
 print("panel_hourly_with_installs.parquet:", len(dd), "rows")
 
 # ---------------------------------------------------------------- 4am anchor

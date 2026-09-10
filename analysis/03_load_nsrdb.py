@@ -57,7 +57,7 @@ for y in YEARS:
     frames.append(acc)
 
 isl = pd.concat(frames, ignore_index=True)
-isl.to_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly.parquet"), index=False)
+isl.to_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly.parquet"), index=False)
 
 # daily midday GHI (10-14h), midday temp, evening temp (17-20h) for the battery/AC controls
 isl["date"] = pd.to_datetime(isl[["year", "month", "day"]])

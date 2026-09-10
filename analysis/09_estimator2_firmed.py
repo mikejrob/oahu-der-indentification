@@ -42,6 +42,16 @@ def dk_kwds(tidx, maxlags):
                           "use_correction": "cluster"})
 
 
+def score_acf(resid, x, nlags):
+    """Autocorrelation of the SCORE (demeaned regressor times residual), which
+    is the series a HAC estimator actually weights. The residual's own ACF is
+    the wrong diagnostic for bandwidth choice: a weekly cycle in load shows up
+    strongly in the residual and only weakly in the score, because the
+    regressor is not weekly-periodic. Verified on simulation, 2026-09-10."""
+    x = np.asarray(x, dtype=float)
+    return acf(np.asarray(resid, dtype=float) * (x - x.mean()), nlags)
+
+
 def acf(x, nlags):
     """Sample autocorrelation of a mean-zero series, lags 0..nlags."""
     x = np.asarray(x, dtype=float)
@@ -71,7 +81,10 @@ def ljung_box(a, T, lags):
 # each regression carries one observation per date (09 PV, 09 shape) or is
 # aggregated to the date by Driscoll-Kraay (09 pooled, 18). Load at a fixed hour
 # of day carries a weekly cycle, so the grid spans several weeks.
+# Bandwidth grid. Simulation puts the score ACF still near 0.29 at lag 28,
+# so the 4(T/100)^(2/9) rule (8 at T=2557) is too short; 28 is the default.
 LAG_GRID = [0, 7, 14, 28, 56, 90]
+LAG_DEFAULT = 28
 ACF_LAGS = 90
 
 ANA = os.environ.get(
@@ -86,9 +99,9 @@ os.makedirs(OUT, exist_ok=True)
 REF_GHI = 1000.0
 
 # ---- radiation: combine 2018/19 (03) + 2020-24 (S3). Dedup on (y,m,d,h).
-r1 = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly.parquet"))
+r1 = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly.parquet"))
 r1 = r1[r1.year.isin([2018, 2019])][["year", "month", "day", "hour", "ghi", "temp", "dni", "dhi"]]
-r2 = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
+r2 = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
 r2 = r2[["year", "month", "day", "hour", "ghi", "temp", "dni", "dhi"]]
 isl = pd.concat([r1, r2], ignore_index=True).drop_duplicates(["year", "month", "day", "hour"])
 isl["date"] = pd.to_datetime(isl[["year", "month", "day"]])
@@ -101,7 +114,7 @@ evening = isl[isl.hour.between(17, 20)].groupby("date").agg(
     temp_evening=("temp", "mean")).reset_index()
 
 # ---- load (clock-corrected), restrict to radiation years
-pan = pd.read_parquet(os.path.join(OUT, "panel_hourly_shifted.parquet"))
+pan = pd.read_parquet(os.path.join(ANA, "panel_hourly_shifted.parquet"))
 pan["date"] = pd.to_datetime(pan["date"])
 pan = pan[pan["year"].isin(RAD_YEARS)].copy()
 
@@ -181,8 +194,12 @@ for h, res in sorted(pv_resid.items()):
         out.append("\n  PV noon-hour HAC diagnostics (T=%d days):" % T)
         out.append("    residual AR(1) rho = %.3f; Andrews Bartlett bandwidth = %.1f days"
                    % (rho, S_and))
-        out.append("    ACF at weekly lags: " + ", ".join(
+        asc = score_acf(res, pv_data[h]["ghi_x_pv"], ACF_LAGS)
+        out.append("    residual ACF: " + ", ".join(
             "L%d=%.3f" % (k, a[k]) for k in (1, 7, 14, 21, 28, 56, 90)))
+        out.append("    SCORE ACF   : " + ", ".join(
+            "L%d=%.3f" % (k, asc[k]) for k in (1, 7, 14, 21, 28, 56, 90))
+            + "   <- this is what sets the bandwidth")
         out.append("    Bartlett band +/-%.3f; Ljung-Box Q: " % band
                    + ", ".join("Q(%d)=%.0f" % (k, v) for k, v in lb.items()))
         cc = [r for r in curve_rows if r["model"] == "pv_h12"]

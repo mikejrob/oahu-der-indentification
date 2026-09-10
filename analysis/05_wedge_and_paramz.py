@@ -75,7 +75,7 @@ eve_out.assign(E_recommended_mwh_per_mwh=min(E_raw, E_phys),
 # g: physical generation per installed MW per day.
 # 1 MW nameplate DC at STC (1000 W/m2). AC energy/day = integral GHI(t)/1000 * PR dt (hours).
 # PR (performance ratio incl inverter, temp, soiling, tilt vs GHI) ~ 0.80 for fixed rooftop.
-isl = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly.parquet"))
+isl = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly.parquet"))
 PR = 0.80
 # daily generation MWh per MW = sum_hour (GHI/1000)*PR ; average across all days
 isl["gen_mwh_per_mw_hr"] = (isl["ghi"] / 1000.0) * PR

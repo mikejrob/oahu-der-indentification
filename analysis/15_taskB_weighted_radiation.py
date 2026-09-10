@@ -31,7 +31,7 @@ os.makedirs(OUT, exist_ok=True)
 MODEL_DISTPV_CF = 0.1822   # annual mean of DistPV rows in variable_capacity_factors.csv
 
 cellghi = pd.read_csv(os.path.join(OUT, "nsrdb_oahu_cell_midday_ghi_by_year.csv"))
-der = pd.read_parquet(os.path.join(OUT, "der_points_latlon_cell.parquet"))
+der = pd.read_parquet(os.path.join(ANA, "der_points_latlon_cell.parquet"))
 YEARS = sorted(cellghi.year.unique())
 
 # cumulative installed MW by cell x year

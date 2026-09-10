@@ -21,7 +21,7 @@ ANA = Path(os.environ.get(
 OUT = Path(os.environ.get(
     "OAHU_OUT", str(Path(__file__).resolve().parent.parent / "data" / "derived")))
 OUT.mkdir(parents=True, exist_ok=True)
-DER = os.path.join(OUT, "der_points.parquet")
+DER = os.path.join(ANA, "der_points.parquet")
 ERA = os.path.join(OUT, "der_by_era.csv")
 
 d = pd.read_parquet(DER)

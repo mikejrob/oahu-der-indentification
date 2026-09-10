@@ -53,9 +53,9 @@ clean.assign(energy_mwh_per_mwh=E_energy, physics_cap=E_phys).to_csv(
 
 # ---------------- (B) firmed g - beta wedge, time-varying ----------------
 # g: physical rooftop gen per MW per day from island GHI (PR=0.80), computed per YEAR now.
-r1 = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly.parquet"))
+r1 = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly.parquet"))
 r1 = r1[r1.year.isin([2018, 2019])]
-r2 = pd.read_parquet(os.path.join(OUT, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
+r2 = pd.read_parquet(os.path.join(ANA, "nsrdb_oahu_island_hourly_2020_2024.parquet"))
 isl = pd.concat([r1[["year", "month", "day", "hour", "ghi"]],
                  r2[["year", "month", "day", "hour", "ghi"]]], ignore_index=True)
 isl = isl.drop_duplicates(["year", "month", "day", "hour"])
