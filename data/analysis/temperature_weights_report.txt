@@ -1,0 +1,16 @@
+station weights by target:
+  t_pv    PHHI 0.208  PHJR 0.369  PHNG 0.132  PHNL 0.291
+  t_bldg  PHHI 0.264  PHJR 0.301  PHNG 0.183  PHNL 0.252
+  t_phnl  PHNL 1.000
+
+grid-derived spatial offsets vs the weighted stations (annual mean):
+  t_pv    level -0.17 degC   diurnal range -0.08 degC
+  t_bldg  level -0.14 degC   diurnal range -0.09 degC
+  t_phnl  level +0.00 degC   diurnal range +0.00 degC
+
+diurnal amplitude of the mean day (degC):
+  t_pv    5.83   (mean level 24.43)
+  t_bldg  5.67   (mean level 24.33)
+  t_phnl  5.53   (mean level 25.39)
+
+rows 105809, 2012-12-01 to 2025-01-01

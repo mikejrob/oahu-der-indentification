@@ -47,8 +47,12 @@ standing between the radiation design and a confound. `temp` and `temp**2`
 carry about a third of the true diurnal swing, so they under-control it. The
 methods log records the air-conditioning confound as "reduced, not
 eliminated"; on this evidence it is reduced less than that wording implies.
-A station series (Honolulu Airport hourly ASOS, free from NOAA) would replace
-the proxy with a measurement.
+`21_build_temperature.py` now builds that replacement, and the substitution
+moves the headline estimate: the noon PV response goes from 0.617 to 0.723 MW
+per MW, 17 percent higher, because the reanalysis control was leaving
+air-conditioning load in the residual and biasing the estimate toward zero.
+Construction, station weights, and the validation against the grid are in
+`FINDINGS_2026-09-10_temperature.md`.
 
 **`pv_mw_cum` is on an undocumented rating basis.** Neither the permit series
 nor the utility's published totals states DC nameplate versus AC. Coefficients
@@ -94,7 +98,10 @@ the load series is.
 | variable | units | definition |
 |---|---|---|
 | `ghi` | W/m2 | Global horizontal irradiance, contemporaneous with `hour`. **Unweighted arithmetic mean over all 264 cells** (`ghi.mean(1)`, `11b` line 47). No land mask, no area weighting, no weighting toward where panels are. |
-| `temp` | deg C | Air temperature, same unweighted 264-cell mean. **A damped reanalysis field, not a station temperature — see the warning below.** |
+| `temp` | deg C | Air temperature, same unweighted 264-cell mean. **A damped reanalysis field. Kept for reproduction of published estimates; use `t_pv` instead.** |
+| `t_pv` | deg C | **Preferred temperature control.** Hourly ASOS observations from four Oahu stations, weighted to where installed PV capacity is, with a spatial offset from the HCDP 250 m grid. Built by `21_build_temperature.py`. |
+| `t_bldg` | deg C | Same construction, weighted by system count rather than kW - a proxy for where buildings are. |
+| `t_phnl` | deg C | Honolulu Airport alone, the naive single-station choice. |
 | `ghi_midday` | W/m2 | Mean `ghi` over hours 10-14 of the same date. Constant within a date. |
 | `temp_midday` | deg C | Mean `temp` over hours 10-14 of the same date. |
 | `temp_evening` | deg C | Mean `temp` over hours 17-20 of the same date. |

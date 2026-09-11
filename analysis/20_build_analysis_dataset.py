@@ -78,6 +78,14 @@ for a in (3, 4):
     h = h.merge(ref, on="date", how="left")
     h["load_anom%d" % a] = h["load_mw"] - h["load_anchor%d" % a]
 
+# station-based temperature (21_build_temperature.py), if built
+tpath = OUTD / "oahu_temperature_hourly.parquet"
+if tpath.exists():
+    tt = pd.read_parquet(tpath)
+    tt["date"] = pd.to_datetime(tt["date"])
+    h = h.merge(tt[["date", "hour", "t_pv", "t_bldg", "t_phnl"]],
+                on=["date", "hour"], how="left")
+
 h["ghi_x_pv"] = h.ghi * h.pv_mw_cum
 h["middayghi_x_batt"] = h.ghi_midday * h.batt_mwh_cum
 h["middayghi_x_pv"] = h.ghi_midday * h.pv_mw_cum
@@ -86,7 +94,8 @@ h["middayghi_x_sysBB"] = h.ghi_midday * h.get("sys_BatteryBonus", 0.0)
 COLS = ["date", "year", "month", "day", "hour", "dow", "ym", "quarter", "season",
         "is_weekend", "load_mw", "load_anchor3", "load_anom3",
         "load_anchor4", "load_anom4", "ghi", "temp", "ghi_midday", "temp_midday",
-        "temp_evening", "ghi_daily", "temp_daily", "pv_mw_cum", "batt_mwh_cum",
+        "temp_evening", "ghi_daily", "temp_daily", "t_pv", "t_bldg", "t_phnl",
+        "pv_mw_cum", "batt_mwh_cum",
         "ghi_x_pv", "middayghi_x_batt", "middayghi_x_pv", "middayghi_x_sysBB",
         "era_714", "roll_h", "dt_hst"] + [c for c in wide.columns if c != "date"]
 h = h[[c for c in COLS if c in h.columns]].sort_values(["date", "hour"])
