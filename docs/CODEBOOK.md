@@ -24,6 +24,32 @@ evidence of a battery, `batt_text`, is true for 108 of 121,246 systems and
 per-MWh magnitudes derived from it are artifacts of the four constants and the
 250 MWh anchor. See `FINDINGS_2026-09-10_standard_errors.md`, addendum.
 
+**`temp` cannot represent the temperature that drives air-conditioning load.**
+Its mean diurnal cycle spans 1.85 degC (24.71 at hour 4 to 26.56 at hour 14)
+against roughly 6-7 degC in the Honolulu station record. It is hourly - 24
+distinct values every day - and its level is right, near 25.5 degC. Only the
+amplitude is wrong, by a factor of three to four. Two causes, measured on 2024
+per-cell data:
+
+- The bounding box is 36 percent land, so roughly two-thirds of the cells sit
+  over water. Splitting cells at a 2.2 degC amplitude puts 87 of 264 on the
+  land side, a set whose centroid (21.49 N, 158.10 W) falls over the leeward
+  Waianae side, and the five largest swings are all there.
+- Dilution is the smaller part. Even the land-side cells average only 2.58 degC
+  of diurnal amplitude, against 1.79 for the ocean side and 2.05 for the
+  all-cell series actually used. NSRDB air temperature is reanalysis-derived,
+  and an island of this size is sub-grid to the parent model, so the field
+  never resolves land-surface heating anywhere in the box.
+
+This matters for identification rather than for description. Cloud cover drives
+both rooftop output and air-conditioning demand, so temperature is the control
+standing between the radiation design and a confound. `temp` and `temp**2`
+carry about a third of the true diurnal swing, so they under-control it. The
+methods log records the air-conditioning confound as "reduced, not
+eliminated"; on this evidence it is reduced less than that wording implies.
+A station series (Honolulu Airport hourly ASOS, free from NOAA) would replace
+the proxy with a measurement.
+
 **`pv_mw_cum` is on an undocumented rating basis.** Neither the permit series
 nor the utility's published totals states DC nameplate versus AC. Coefficients
 estimated per *reported* MW are internally consistent, because the same series
@@ -67,8 +93,8 @@ the load series is.
 
 | variable | units | definition |
 |---|---|---|
-| `ghi` | W/m2 | Global horizontal irradiance, contemporaneous with `hour`. |
-| `temp` | deg C | Air temperature, contemporaneous. |
+| `ghi` | W/m2 | Global horizontal irradiance, contemporaneous with `hour`. **Unweighted arithmetic mean over all 264 cells** (`ghi.mean(1)`, `11b` line 47). No land mask, no area weighting, no weighting toward where panels are. |
+| `temp` | deg C | Air temperature, same unweighted 264-cell mean. **A damped reanalysis field, not a station temperature — see the warning below.** |
 | `ghi_midday` | W/m2 | Mean `ghi` over hours 10-14 of the same date. Constant within a date. |
 | `temp_midday` | deg C | Mean `temp` over hours 10-14 of the same date. |
 | `temp_evening` | deg C | Mean `temp` over hours 17-20 of the same date. |
@@ -134,5 +160,16 @@ columns merged into both panels.
    2006-2025 with 175,319 hourly rows; an earlier vintage used in the report had
    166,559 rows through 2024. Point estimates shift slightly against published
    figures for this reason.
-5. **`dni` and `dhi` are absent.** The fast extractor pulls only `ghi` and
+5. **Radiation is a box mean, and the box is mostly ocean.** On 2024 data,
+   midday GHI averages 670 W/m2 over land-side cells against 720 over ocean-side
+   and 704 over all 264 - land is dimmer, consistent with orographic cloud.
+   Daily series correlate at 0.92 between the two sets and at 0.97 between land
+   and the all-cell mean, and regressing land on the all-cell mean gives a slope
+   of 1.024, so day-to-day signal attenuation is only about 2 percent. The level
+   gap is larger, near 5 percent, which matters for any quantity computed
+   directly from the radiation level rather than from a regression slope - the
+   physical-generation term in the behind-the-meter wedge is the one to check.
+   Note this sits in tension with Task B, which found install-weighted radiation
+   only 0.93 percent below uniform; a proper land mask would settle it.
+6. **`dni` and `dhi` are absent.** The fast extractor pulls only `ghi` and
    temperature to halve the transfer.
