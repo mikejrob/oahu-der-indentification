@@ -51,15 +51,21 @@ for f in sorted(glob.glob(str(RAW / "asos" / "*.csv"))):
     d = d.dropna(subset=["tmpf"])
     d["valid"] = pd.to_datetime(d["valid"])
     d["degC"] = (d["tmpf"] - 32.0) * 5.0 / 9.0
+    # dewpoint: a direct moisture measure, less collinear with temperature than
+    # relative humidity. Cloudy days are humid and humidity raises cooling load,
+    # so this is the control that closes assumption A1.
+    d["dewC"] = (d["dwpf"] - 32.0) * 5.0 / 9.0
     d["date"] = d["valid"].dt.normalize()
     d["hour"] = d["valid"].dt.hour
     # several reports per hour (routine plus specials): take the hourly mean
-    g = d.groupby(["station", "date", "hour"], as_index=False)["degC"].mean()
+    g = d.groupby(["station", "date", "hour"], as_index=False)[["degC", "dewC"]].mean()
     rows.append(g)
 obs = pd.concat(rows, ignore_index=True)
 obs["month"] = obs["date"].dt.month
 wide = obs.pivot_table(index=["date", "hour"], columns="station",
                        values="degC").reset_index()
+dew = obs.pivot_table(index=["date", "hour"], columns="station",
+                      values="dewC").reset_index()
 print("station hours: " + ", ".join(
     "%s %d" % (s, int(wide[s].notna().sum())) for s in STA if s in wide))
 
@@ -204,6 +210,17 @@ for t, w in targets.items():
     # the grid range is a spread of daily extremes; a mean-day cycle spans 0.845
     # of it (measured on the four stations), so the offset is scaled to match.
     out[t] = mg["c"].values + dlev + mg["u"].values * drng * 0.845 + anom
+
+# weighted dewpoint on the same station weights. No spatial offset: the HCDP
+# atlas carries no dewpoint grid, and the moisture field over an island this
+# size is far smoother than temperature, so the offset would be second order.
+for t, w in targets.items():
+    num = np.zeros(len(out)); den = np.zeros(len(out))
+    for s_, ws in w.items():
+        v = dew[s_].values if s_ in dew else np.full(len(out), np.nan)
+        ok = ~np.isnan(v)
+        num[ok] += ws * v[ok]; den[ok] += ws
+    out[t.replace("t_", "td_")] = np.where(den > 0, num / np.maximum(den, 1e-9), np.nan)
 
 out = out.dropna(subset=list(targets)).sort_values(["date", "hour"])
 out["date"] = out["date"].dt.date

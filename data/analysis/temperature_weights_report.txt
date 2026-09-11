@@ -9,8 +9,8 @@ grid-derived spatial offsets vs the weighted stations (annual mean):
   t_phnl  level +0.00 degC   diurnal range +0.00 degC
 
 diurnal amplitude of the mean day (degC):
-  t_pv    5.83   (mean level 24.43)
-  t_bldg  5.67   (mean level 24.33)
-  t_phnl  5.53   (mean level 25.39)
+  t_pv    5.78   (mean level 24.23)
+  t_bldg  5.62   (mean level 24.12)
+  t_phnl  5.48   (mean level 25.27)
 
-rows 105809, 2012-12-01 to 2025-01-01
+rows 175055, 2005-01-01 to 2025-01-01
