@@ -11,10 +11,13 @@ producer, hashed artifacts downstream.
 
 ## Layout
 
-    analysis/       estimators and data preparation, 01-16 and 18
+    analysis/       estimators and data preparation; 01-27 Python (early designs),
+                    28-34 the anchored-profile line; 31-33 in R are the reference
+                    estimators (lib_panel.R assembles the panel)
     data/raw/       panels pulled from Koa; not tracked (see Data)
     data/derived/   estimator outputs; tracked, these are the results
-    docs/           methods log and task notes
+    docs/           methods log, findings records (read FINDINGS_2026-09-12_* first),
+                    handoff, codebook, program taxonomy, candidate papers
     scripts/        environment setup, data pull, checksums
     paper/          manuscript
 
